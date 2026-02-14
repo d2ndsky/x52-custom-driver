@@ -1,0 +1,253 @@
+<Window x:Class="X52.CustomDriver.App.MappingEditorWindow"
+    xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    xmlns:local="clr-namespace:X52.CustomDriver.App" Title="Ærakon x52 driver - Editor" Height="650" Width="950" Background="#050505" Foreground="White" WindowStartupLocation="CenterOwner" FontFamily="Segoe UI">
+
+    <Window.Resources>
+        <local:ModeConverter x:Key="ModeConverter"/>
+
+        <!-- Pinceles de Contraste Extremo -->
+        <SolidColorBrush x:Key="NeonBlue" Color="#00D2FF"/>
+        <SolidColorBrush x:Key="DeepDark" Color="#000000"/>
+
+        <!-- ToggleButton Template para ComboBox -->
+        <ControlTemplate x:Key="ComboBoxToggleButton" TargetType="ToggleButton">
+            <Grid>
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition />
+                    <ColumnDefinition Width="20" />
+                </Grid.ColumnDefinitions>
+                <Border x:Name="Border" Grid.ColumnSpan="2" Background="#111111" BorderBrush="#444444" BorderThickness="1" />
+                <Path x:Name="Arrow" Grid.Column="1" Fill="White" HorizontalAlignment="Center" VerticalAlignment="Center" Data="M0,0 L10,0 L5,6 z" />
+            </Grid>
+            <ControlTemplate.Triggers>
+                <Trigger Property="IsChecked" Value="True">
+                    <Setter TargetName="Border" Property="BorderBrush" Value="{StaticResource NeonBlue}" />
+                </Trigger>
+            </ControlTemplate.Triggers>
+        </ControlTemplate>
+
+        <!-- ComboBox Template Ultra-Minimalista -->
+        <ControlTemplate x:Key="MinimalComboBoxTemplate" TargetType="ComboBox">
+            <Grid>
+                <ToggleButton Name="ToggleButton" Template="{StaticResource ComboBoxToggleButton}" Grid.Column="2" Focusable="false" IsChecked="{Binding Path=IsDropDownOpen,Mode=TwoWay,RelativeSource={RelativeSource TemplatedParent}}" ClickMode="Press" />
+                <ContentPresenter Name="ContentSite" IsHitTestVisible="False" Content="{TemplateBinding SelectionBoxItem}" ContentTemplate="{TemplateBinding SelectionBoxItemTemplate}" ContentTemplateSelector="{TemplateBinding ItemTemplateSelector}" Margin="10,3,23,3" VerticalAlignment="Center" HorizontalAlignment="Left" />
+                <TextBox x:Name="PART_EditableTextBox" Style="{x:Null}" Template="{x:Null}" HorizontalAlignment="Left" VerticalAlignment="Center" Margin="3,3,23,3" Focusable="True" Background="Transparent" Visibility="Hidden" IsReadOnly="{TemplateBinding IsReadOnly}"/>
+                <Popup Name="Popup" Placement="Bottom" IsOpen="{TemplateBinding IsDropDownOpen}" AllowsTransparency="True" Focusable="False" PopupAnimation="Slide">
+                    <Grid Name="DropDown" SnapsToDevicePixels="True" MinWidth="{TemplateBinding ActualWidth}" MaxHeight="{TemplateBinding MaxDropDownHeight}">
+                        <Border x:Name="DropDownBorder" Background="#111111" BorderThickness="1" BorderBrush="{StaticResource NeonBlue}"/>
+                        <ScrollViewer Margin="4,6,4,6" SnapsToDevicePixels="True">
+                            <StackPanel IsItemsHost="True" KeyboardNavigation.DirectionalNavigation="Contained" />
+                        </ScrollViewer>
+                    </Grid>
+                </Popup>
+            </Grid>
+            <ControlTemplate.Triggers>
+                <Trigger Property="HasItems" Value="false">
+                    <Setter TargetName="DropDownBorder" Property="MinHeight" Value="95"/>
+                </Trigger>
+                <Trigger Property="IsGrouping" Value="true">
+                    <Setter Property="ScrollViewer.CanContentScroll" Value="false"/>
+                </Trigger>
+            </ControlTemplate.Triggers>
+        </ControlTemplate>
+
+        <!-- Estilo ComboBox BASE -->
+        <Style x:Key="ExtremeVisibilityComboBox" TargetType="ComboBox">
+            <Setter Property="Foreground" Value="White"/>
+            <Setter Property="Template" Value="{StaticResource MinimalComboBoxTemplate}"/>
+            <Setter Property="ItemContainerStyle">
+                <Setter.Value>
+                    <Style TargetType="ComboBoxItem">
+                        <Setter Property="Background" Value="#111111"/>
+                        <Setter Property="Foreground" Value="White"/>
+                        <Setter Property="Padding" Value="10,6"/>
+                        <Setter Property="BorderThickness" Value="0"/>
+                        <Style.Triggers>
+                            <Trigger Property="IsHighlighted" Value="True">
+                                <Setter Property="Background" Value="{StaticResource NeonBlue}"/>
+                                <Setter Property="Foreground" Value="Black"/>
+                            </Trigger>
+                        </Style.Triggers>
+                    </Style>
+                </Setter.Value>
+            </Setter>
+        </Style>
+
+        <!-- Estilos TextBox -->
+        <Style x:Key="MacroRecordingTextBox" TargetType="TextBox">
+            <Setter Property="Background" Value="#000000"/>
+            <Setter Property="Foreground" Value="{StaticResource NeonBlue}"/>
+            <Setter Property="BorderThickness" Value="1"/>
+            <Setter Property="BorderBrush" Value="#333"/>
+            <Setter Property="CaretBrush" Value="White"/>
+            <Setter Property="Padding" Value="10,4"/>
+            <Setter Property="VerticalContentAlignment" Value="Center"/>
+            <Style.Triggers>
+                <Trigger Property="IsFocused" Value="True">
+                    <Setter Property="BorderBrush" Value="{StaticResource NeonBlue}"/>
+                    <Setter Property="Background" Value="#050505"/>
+                </Trigger>
+            </Style.Triggers>
+        </Style>
+
+        <!-- Estilos DataGrid -->
+        <Style TargetType="DataGrid">
+            <Setter Property="Background" Value="#050505"/>
+            <Setter Property="Foreground" Value="White"/>
+            <Setter Property="BorderBrush" Value="#222"/>
+            <Setter Property="RowBackground" Value="#050505"/>
+            <Setter Property="AlternatingRowBackground" Value="#0A0A0A"/>
+            <Setter Property="HorizontalGridLinesBrush" Value="#222"/>
+            <Setter Property="HeadersVisibility" Value="Column"/>
+            <Setter Property="GridLinesVisibility" Value="Horizontal"/>
+        </Style>
+
+        <Style TargetType="DataGridColumnHeader">
+            <Setter Property="Background" Value="#151515"/>
+            <Setter Property="Foreground" Value="{StaticResource NeonBlue}"/>
+            <Setter Property="Padding" Value="10,12"/>
+            <Setter Property="FontWeight" Value="Bold"/>
+            <Setter Property="BorderBrush" Value="#333"/>
+            <Setter Property="BorderThickness" Value="0,0,1,1"/>
+        </Style>
+
+        <Style TargetType="DataGridCell">
+            <Setter Property="Padding" Value="0"/>
+            <Setter Property="BorderThickness" Value="0"/>
+            <Style.Triggers>
+                <Trigger Property="IsSelected" Value="True">
+                    <Setter Property="Background" Value="#002233"/>
+                    <Setter Property="Foreground" Value="White"/>
+                </Trigger>
+            </Style.Triggers>
+        </Style>
+    </Window.Resources>
+
+    <Grid Margin="20">
+        <Grid.ColumnDefinitions>
+            <ColumnDefinition Width="220"/>
+            <ColumnDefinition Width="*"/>
+        </Grid.ColumnDefinitions>
+
+        <!-- Profiles List -->
+        <StackPanel Grid.Column="0" Margin="0,0,15,0">
+            <TextBlock Text="PROFILES" FontWeight="Bold" Foreground="{StaticResource NeonBlue}" Margin="0,0,0,10" FontSize="18"/>
+            <ListBox x:Name="ProfilesList" Background="#0A0A0A" Foreground="White" BorderThickness="0" Height="450" SelectionChanged="ProfilesList_SelectionChanged">
+                <ListBox.ItemTemplate>
+                    <DataTemplate>
+                        <TextBlock Text="{Binding Name}" Padding="10" FontSize="14"/>
+                    </DataTemplate>
+                </ListBox.ItemTemplate>
+            </ListBox>
+            <Button Content="+ NEW PROFILE" Margin="0,15,0,0" Padding="12" Background="#111" Foreground="{StaticResource NeonBlue}" BorderBrush="{StaticResource NeonBlue}" BorderThickness="1" Click="NewProfile_Click" FontWeight="Bold"/>
+        </StackPanel>
+
+        <!-- Editor Area -->
+        <Grid Grid.Column="1" Margin="15,0,0,0">
+            <Grid.RowDefinitions>
+                <RowDefinition Height="Auto"/>
+                <RowDefinition Height="Auto"/>
+                <RowDefinition Height="*"/>
+                <RowDefinition Height="Auto"/>
+            </Grid.RowDefinitions>
+
+            <!-- Profile Info -->
+            <StackPanel Grid.Row="0" Margin="0,0,0,25">
+                <TextBlock Text="PROFILE SETTINGS" FontWeight="Bold" Foreground="{StaticResource NeonBlue}" Margin="0,0,0,15" FontSize="18"/>
+                <UniformGrid Columns="2">
+                    <StackPanel Margin="0,0,10,0">
+                        <TextBlock Text="Process Name (.exe)" Foreground="#888" FontSize="11" Margin="0,0,0,5"/>
+                        <TextBox x:Name="ProcessNameBox" Style="{StaticResource MacroRecordingTextBox}"/>
+                    </StackPanel>
+                    <Grid>
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="*"/>
+                            <ColumnDefinition Width="*"/>
+                        </Grid.ColumnDefinitions>
+                        <StackPanel Grid.Column="0" Margin="10,0,5,0">
+                            <TextBlock Text="Sens X (0.1-3.0)" Foreground="#888" FontSize="11" Margin="0,0,0,5"/>
+                            <TextBox x:Name="SensitivityXBox" Style="{StaticResource MacroRecordingTextBox}" Text="1.0"/>
+                        </StackPanel>
+                        <StackPanel Grid.Column="1" Margin="5,0,0,0">
+                            <TextBlock Text="Sens Y (0.1-3.0)" Foreground="#888" FontSize="11" Margin="0,0,0,5"/>
+                            <TextBox x:Name="SensitivityYBox" Style="{StaticResource MacroRecordingTextBox}" Text="1.0"/>
+                        </StackPanel>
+                    </Grid>
+                </UniformGrid>
+            </StackPanel>
+
+            <!-- Buttons Mapping Header -->
+            <DockPanel Grid.Row="1" Margin="0,0,0,10">
+                <TextBlock Text="BUTTON MAPPINGS" VerticalAlignment="Center" FontWeight="Bold" Foreground="#FF0055" FontSize="18"/>
+                <StackPanel Orientation="Horizontal" HorizontalAlignment="Right">
+                    <Button Content="REMOVE SELECTED" Padding="10,8" Margin="0,0,10,0" Background="#220000" Foreground="#FF5555" BorderBrush="#FF5555" BorderThickness="1" Click="RemoveMapping_Click" FontWeight="Bold"/>
+                    <Button Content="+ ADD NEW MAPPING" Padding="15,8" Background="#111" Foreground="#FF0055" BorderBrush="#FF0055" BorderThickness="1" Click="AddMapping_Click" FontWeight="Bold"/>
+                </StackPanel>
+            </DockPanel>
+
+            <!-- DataGrid de Mapeos -->
+            <DataGrid x:Name="MappingsGrid" Grid.Row="2" AutoGenerateColumns="False" CanUserAddRows="False" RowHeight="45">
+                <DataGrid.Columns>
+                    <!-- Mode -->
+                    <DataGridTemplateColumn Header="Mode" Width="110">
+                        <DataGridTemplateColumn.CellTemplate>
+                            <DataTemplate>
+                                <TextBlock Text="{Binding Mode, Converter={StaticResource ModeConverter}}" VerticalAlignment="Center" HorizontalAlignment="Center" Foreground="#AAA" FontSize="13"/>
+                            </DataTemplate>
+                        </DataGridTemplateColumn.CellTemplate>
+                        <DataGridTemplateColumn.CellEditingTemplate>
+                            <DataTemplate>
+                                <ComboBox SelectedItem="{Binding Mode}" ItemsSource="{Binding RelativeSource={RelativeSource AncestorType=Window}, Path=AvailableModes}" Style="{StaticResource ExtremeVisibilityComboBox}"/>
+                            </DataTemplate>
+                        </DataGridTemplateColumn.CellEditingTemplate>
+                    </DataGridTemplateColumn>
+
+                    <!-- Hardware Button -->
+                    <DataGridTemplateColumn Header="X52 Hardware Button" Width="240">
+                        <DataGridTemplateColumn.CellTemplate>
+                            <DataTemplate>
+                                <TextBlock Text="{Binding ButtonName}" VerticalAlignment="Center" Padding="15,0" FontWeight="Bold" Foreground="#FFFFFF" FontSize="14"/>
+                            </DataTemplate>
+                        </DataGridTemplateColumn.CellTemplate>
+                        <DataGridTemplateColumn.CellEditingTemplate>
+                            <DataTemplate>
+                                <ComboBox SelectedItem="{Binding ButtonName}" ItemsSource="{Binding RelativeSource={RelativeSource AncestorType=Window}, Path=AvailableButtons}" Style="{StaticResource ExtremeVisibilityComboBox}" IsDropDownOpen="True"/>
+                            </DataTemplate>
+                        </DataGridTemplateColumn.CellEditingTemplate>
+                    </DataGridTemplateColumn>
+
+                    <!-- Keyboard Keys (Macro Recorder) -->
+                    <DataGridTemplateColumn Header="Keyboard Keys (Click &amp; Type)" Width="*">
+                        <DataGridTemplateColumn.CellTemplate>
+                            <DataTemplate>
+                                <TextBlock Text="{Binding KeySequenceString}" Padding="15,0" VerticalAlignment="Center" Foreground="{StaticResource NeonBlue}" FontSize="14"/>
+                            </DataTemplate>
+                        </DataGridTemplateColumn.CellTemplate>
+                        <DataGridTemplateColumn.CellEditingTemplate>
+                            <DataTemplate>
+                                <TextBox Text="{Binding KeySequenceString, UpdateSourceTrigger=PropertyChanged}" Style="{StaticResource MacroRecordingTextBox}" PreviewKeyDown="MacroBox_PreviewKeyDown"/>
+                            </DataTemplate>
+                        </DataGridTemplateColumn.CellEditingTemplate>
+                    </DataGridTemplateColumn>
+
+                    <!-- vJoy -->
+                    <DataGridCheckBoxColumn Header="vJoy" Binding="{Binding EnableVJoy}" Width="60">
+                        <DataGridCheckBoxColumn.ElementStyle>
+                            <Style TargetType="CheckBox">
+                                <Setter Property="HorizontalAlignment" Value="Center"/>
+                                <Setter Property="VerticalAlignment" Value="Center"/>
+                            </Style>
+                        </DataGridCheckBoxColumn.ElementStyle>
+                    </DataGridCheckBoxColumn>
+                </DataGrid.Columns>
+            </DataGrid>
+
+            <!-- Bottom Actions -->
+            <StackPanel Grid.Row="3" Orientation="Horizontal" HorizontalAlignment="Right" Margin="0,25,0,0">
+                <Button Content="DELETE" Background="#200" Foreground="#FF5555" Padding="25,12" Margin="0,0,15,0" BorderThickness="1" BorderBrush="#FF5555" Click="DeleteProfile_Click" FontWeight="Bold"/>
+                <Button Content="SAVE PERMANENTLY" Background="{StaticResource NeonBlue}" Foreground="Black" Padding="45,15" FontWeight="Bold" BorderThickness="0" Click="SaveProfile_Click" FontSize="16"/>
+            </StackPanel>
+        </Grid>
+    </Grid>
+</Window>

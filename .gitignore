@@ -1,0 +1,16 @@
+[Bb]in/
+[Oo]bj/
+.vs/
+.vscode/
+*.user
+*.suo
+*.userosscache
+*.sln.docstates
+startup_log.txt
+profiles.json
+InstallerOutput/
+X52_Desktop_v*/
+*.exe
+*.dll
+*.pdb
+*.zip

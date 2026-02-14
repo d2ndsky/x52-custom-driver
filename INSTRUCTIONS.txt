@@ -1,0 +1,42 @@
+==============================================================================
+                      ÆRAKON X52 DRIVER - INSTRUCCIONES
+==============================================================================
+
+¡Bienvenido al driver definitivo para tu Logitech/Saitek X52!
+
+------------------------------------------------------------------------------
+REQUISITO IMPRESCINDIBLE: vJoy
+------------------------------------------------------------------------------
+Este driver funciona como un "puente" entre tu X52 y un joystick virtual.
+Para que funcione, NECESITAS tener instalado vJoy.
+
+Si no lo tienes instalado, el driver NO funcionará.
+
+👉 DESCARGA vJoy AQUÍ:
+   https://github.com/jshafer817/vJoy/releases
+
+(Se recomienda la versión 2.1.9.1 o superior)
+
+------------------------------------------------------------------------------
+CÓMO FUNCIONA
+------------------------------------------------------------------------------
+1. Instala vJoy y reinicia si es necesario.
+2. Instala este driver (Ærakon X52).
+3. Ejecuta "Ærakon x52 driver" desde el escritorio.
+4. Verás los indicadores en verde:
+   - [X52]: Conectado
+   - [vJoy]: Conectado
+
+El driver se encargará de traducir tus movimientos y corregir los fallos
+del hardware original (como el Mouse Nub o el Hat 2).
+
+------------------------------------------------------------------------------
+CARACTERÍSTICAS
+------------------------------------------------------------------------------
+- Ghostbuster: Elimina pulsaciones fantasma del ratón.
+- Sensitivity: Ajusta la curva de respuesta de tus ejes.
+- Hybrid Mode: Mezcla teclado y joystick en tus perfiles.
+
+¡Disfruta del vuelo!
+______________________________________________________________________________
+Ærakon Systems

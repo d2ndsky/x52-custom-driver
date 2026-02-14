@@ -1,0 +1,374 @@
+﻿<Window x:Class="X52.CustomDriver.App.MainWindow"
+    xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+    xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+    xmlns:local="clr-namespace:X52.CustomDriver.App" mc:Ignorable="d" Title="Ærakon x52 driver" Height="550" Width="900" ResizeMode="CanResizeWithGrip" WindowStyle="SingleBorderWindow" Background="#050505" Foreground="White" FontFamily="Segoe UI Semibold">
+
+    <Window.Resources>
+        <Style x:Key="NeonProgressBar" TargetType="ProgressBar">
+            <Setter Property="Background" Value="#111"/>
+            <Setter Property="Foreground" Value="#00D2FF"/>
+            <Setter Property="Height" Value="10"/>
+            <Setter Property="BorderThickness" Value="0"/>
+            <Style.Triggers>
+                <Trigger Property="Value" Value="100">
+                    <Setter Property="Foreground" Value="#FF0000"/>
+                </Trigger>
+                <Trigger Property="Value" Value="0">
+                    <Setter Property="Foreground" Value="#FF0000"/>
+                </Trigger>
+            </Style.Triggers>
+        </Style>
+        <Style x:Key="AxisLabel" TargetType="TextBlock">
+            <Setter Property="FontSize" Value="12"/>
+            <Setter Property="Foreground" Value="#888"/>
+            <Setter Property="Margin" Value="0,10,0,2"/>
+        </Style>
+    </Window.Resources>
+
+    <ScrollViewer VerticalScrollBarVisibility="Auto" HorizontalScrollBarVisibility="Disabled">
+        <Grid Margin="20">
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="2*"/>
+                <ColumnDefinition Width="1*"/>
+            </Grid.ColumnDefinitions>
+
+            <StackPanel Grid.Column="0">
+                <TextBlock Text="Ærakon x52 driver v1.1.7 (SENSITIVITY)" FontSize="20" FontWeight="Bold" Foreground="#00D2FF" Margin="0,0,0,20"/>
+
+                <TextBlock Text="PRIMARY AXES" FontWeight="Bold" Margin="0,10,0,10" Foreground="#555"/>
+
+                <TextBlock Text="X AXIS (Aileron)" Style="{StaticResource AxisLabel}"/>
+                <ProgressBar Style="{StaticResource NeonProgressBar}" Value="{Binding XPercent, Mode=OneWay}"/>
+
+                <TextBlock Text="Y AXIS (Elevator)" Style="{StaticResource AxisLabel}"/>
+                <ProgressBar Style="{StaticResource NeonProgressBar}" Value="{Binding YPercent, Mode=OneWay}"/>
+
+                <TextBlock Text="Z AXIS (Rudder)" Style="{StaticResource AxisLabel}"/>
+                <ProgressBar Style="{StaticResource NeonProgressBar}" Value="{Binding ZPercent, Mode=OneWay}"/>
+
+                <TextBlock Text="THROTTLE &amp; AUX" FontWeight="Bold" Margin="0,30,0,10" Foreground="#555"/>
+
+                <TextBlock Text="THROTTLE" Style="{StaticResource AxisLabel}"/>
+                <ProgressBar Style="{StaticResource NeonProgressBar}" Value="{Binding ThrottlePercent, Mode=OneWay}" Foreground="#FF0055"/>
+
+                <TextBlock Text="SLIDER" Style="{StaticResource AxisLabel}"/>
+                <ProgressBar Style="{StaticResource NeonProgressBar}" Value="{Binding SliderPercent, Mode=OneWay}"/>
+
+                <UniformGrid Columns="2" Margin="0,20,0,0">
+                    <StackPanel Margin="0,0,10,0">
+                        <TextBlock Text="ROTARY 1" Style="{StaticResource AxisLabel}"/>
+                        <ProgressBar Style="{StaticResource NeonProgressBar}" Value="{Binding Rotary1Percent, Mode=OneWay}"/>
+                    </StackPanel>
+                    <StackPanel Margin="10,0,0,0">
+                        <TextBlock Text="ROTARY 2" Style="{StaticResource AxisLabel}"/>
+                        <ProgressBar Style="{StaticResource NeonProgressBar}" Value="{Binding Rotary2Percent, Mode=OneWay}"/>
+                    </StackPanel>
+                </UniformGrid>
+
+                <TextBlock Text="HARDWARE MONITOR" FontWeight="Bold" Margin="0,30,0,10" Foreground="#555"/>
+                <Border Background="#111" CornerRadius="10" Padding="15">
+                    <ItemsControl ItemsSource="{Binding PhysicalButtons}">
+                        <ItemsControl.ItemsPanel>
+                            <ItemsPanelTemplate>
+                                <UniformGrid Columns="8" />
+                            </ItemsPanelTemplate>
+                        </ItemsControl.ItemsPanel>
+                        <ItemsControl.ItemTemplate>
+                            <DataTemplate>
+                                <Grid Margin="3">
+                                    <Ellipse Width="28" Height="28" Stroke="#333" StrokeThickness="1" Name="BtnCircle">
+                                        <Ellipse.Style>
+                                            <Style TargetType="Ellipse">
+                                                <Setter Property="Fill" Value="#050505"/>
+                                                <Style.Triggers>
+                                                    <DataTrigger Binding="{Binding IsPressed}" Value="True">
+                                                        <Setter Property="Fill" Value="#FF0000"/>
+                                                        <Setter Property="Stroke" Value="#FFAAAA"/>
+                                                    </DataTrigger>
+                                                </Style.Triggers>
+                                            </Style>
+                                        </Ellipse.Style>
+                                    </Ellipse>
+                                    <TextBlock Text="{Binding Name}" HorizontalAlignment="Center" VerticalAlignment="Center" FontSize="11" Foreground="White" FontWeight="Bold">
+                                        <TextBlock.Style>
+                                            <Style TargetType="TextBlock">
+                                                <Style.Triggers>
+                                                    <DataTrigger Binding="{Binding IsPressed}" Value="True">
+                                                        <Setter Property="Foreground" Value="White"/>
+                                                    </DataTrigger>
+                                                </Style.Triggers>
+                                            </Style>
+                                        </TextBlock.Style>
+                                    </TextBlock>
+                                </Grid>
+                            </DataTemplate>
+                        </ItemsControl.ItemTemplate>
+                    </ItemsControl>
+                </Border>
+
+                <TextBlock Text="MODE SELECTOR" FontWeight="Bold" Margin="0,30,0,10" Foreground="#555"/>
+                <StackPanel Orientation="Horizontal" HorizontalAlignment="Left" Margin="5,0,0,0">
+                    <Grid Margin="0,0,15,0">
+                        <Border Width="60" Height="8" Background="#1a1a1a" CornerRadius="4">
+                            <Border Name="Mode1Bar" CornerRadius="4">
+                                <Border.Style>
+                                    <Style TargetType="Border">
+                                        <Setter Property="Background" Value="Transparent"/>
+                                        <Style.Triggers>
+                                            <DataTrigger Binding="{Binding IsMode1}" Value="True">
+                                                <Setter Property="Background" Value="#00D2FF"/>
+                                                <Setter Property="Effect">
+                                                    <Setter.Value>
+                                                        <DropShadowEffect Color="#00D2FF" BlurRadius="10" ShadowDepth="0"/>
+                                                    </Setter.Value>
+                                                </Setter>
+                                            </DataTrigger>
+                                        </Style.Triggers>
+                                    </Style>
+                                </Border.Style>
+                            </Border>
+                        </Border>
+                        <TextBlock Text="MODE 1" FontSize="9" Foreground="#444" Margin="0,12,0,0" HorizontalAlignment="Center">
+                            <TextBlock.Style>
+                                <Style TargetType="TextBlock">
+                                    <Style.Triggers>
+                                        <DataTrigger Binding="{Binding IsMode1}" Value="True">
+                                            <Setter Property="Foreground" Value="#00D2FF"/>
+                                            <Setter Property="FontWeight" Value="Bold"/>
+                                        </DataTrigger>
+                                    </Style.Triggers>
+                                </Style>
+                            </TextBlock.Style>
+                        </TextBlock>
+                    </Grid>
+
+                    <Grid Margin="0,0,15,0">
+                        <Border Width="60" Height="8" Background="#1a1a1a" CornerRadius="4">
+                            <Border Name="Mode2Bar" CornerRadius="4">
+                                <Border.Style>
+                                    <Style TargetType="Border">
+                                        <Setter Property="Background" Value="Transparent"/>
+                                        <Style.Triggers>
+                                            <DataTrigger Binding="{Binding IsMode2}" Value="True">
+                                                <Setter Property="Background" Value="#00D2FF"/>
+                                                <Setter Property="Effect">
+                                                    <Setter.Value>
+                                                        <DropShadowEffect Color="#00D2FF" BlurRadius="10" ShadowDepth="0"/>
+                                                    </Setter.Value>
+                                                </Setter>
+                                            </DataTrigger>
+                                        </Style.Triggers>
+                                    </Style>
+                                </Border.Style>
+                            </Border>
+                        </Border>
+                        <TextBlock Text="MODE 2" FontSize="9" Foreground="#444" Margin="0,12,0,0" HorizontalAlignment="Center">
+                            <TextBlock.Style>
+                                <Style TargetType="TextBlock">
+                                    <Style.Triggers>
+                                        <DataTrigger Binding="{Binding IsMode2}" Value="True">
+                                            <Setter Property="Foreground" Value="#00D2FF"/>
+                                            <Setter Property="FontWeight" Value="Bold"/>
+                                        </DataTrigger>
+                                    </Style.Triggers>
+                                </Style>
+                            </TextBlock.Style>
+                        </TextBlock>
+                    </Grid>
+
+                    <Grid>
+                        <Border Width="60" Height="8" Background="#1a1a1a" CornerRadius="4">
+                            <Border Name="Mode3Bar" CornerRadius="4">
+                                <Border.Style>
+                                    <Style TargetType="Border">
+                                        <Setter Property="Background" Value="Transparent"/>
+                                        <Style.Triggers>
+                                            <DataTrigger Binding="{Binding IsMode3}" Value="True">
+                                                <Setter Property="Background" Value="#00D2FF"/>
+                                                <Setter Property="Effect">
+                                                    <Setter.Value>
+                                                        <DropShadowEffect Color="#00D2FF" BlurRadius="10" ShadowDepth="0"/>
+                                                    </Setter.Value>
+                                                </Setter>
+                                            </DataTrigger>
+                                        </Style.Triggers>
+                                    </Style>
+                                </Border.Style>
+                            </Border>
+                        </Border>
+                        <TextBlock Text="MODE 3" FontSize="9" Foreground="#444" Margin="0,12,0,0" HorizontalAlignment="Center">
+                            <TextBlock.Style>
+                                <Style TargetType="TextBlock">
+                                    <Style.Triggers>
+                                        <DataTrigger Binding="{Binding IsMode3}" Value="True">
+                                            <Setter Property="Foreground" Value="#00D2FF"/>
+                                            <Setter Property="FontWeight" Value="Bold"/>
+                                        </DataTrigger>
+                                    </Style.Triggers>
+                                </Style>
+                            </TextBlock.Style>
+                        </TextBlock>
+                    </Grid>
+                </StackPanel>
+            </StackPanel>
+
+            <!-- Right Column: Status & Profiles -->
+            <StackPanel Grid.Column="1" Margin="20,0,0,0">
+                <Border Background="#111" CornerRadius="10" Padding="15">
+                    <StackPanel>
+                        <TextBlock Text="CONNECTION STATUS" FontSize="14" Foreground="#555" Margin="0,0,0,10"/>
+                        <StackPanel Orientation="Horizontal" Margin="0,5">
+                            <Ellipse Width="10" Height="10" VerticalAlignment="Center" Margin="0,0,10,0">
+                                <Ellipse.Style>
+                                    <Style TargetType="Ellipse">
+                                        <Setter Property="Fill" Value="Red"/>
+                                        <Style.Triggers>
+                                            <DataTrigger Binding="{Binding IsConnected}" Value="True">
+                                                <Setter Property="Fill" Value="#00FF88"/>
+                                            </DataTrigger>
+                                        </Style.Triggers>
+                                    </Style>
+                                </Ellipse.Style>
+                            </Ellipse>
+                            <TextBlock Text="X52 Hardware" FontSize="12"/>
+                        </StackPanel>
+                        <StackPanel Orientation="Horizontal" Margin="0,5">
+                            <Ellipse Width="10" Height="10" VerticalAlignment="Center" Margin="0,0,10,0">
+                                <Ellipse.Style>
+                                    <Style TargetType="Ellipse">
+                                        <Setter Property="Fill" Value="Red"/>
+                                        <Style.Triggers>
+                                            <DataTrigger Binding="{Binding IsVJoyActive}" Value="True">
+                                                <Setter Property="Fill" Value="#00FF88"/>
+                                            </DataTrigger>
+                                        </Style.Triggers>
+                                    </Style>
+                                </Ellipse.Style>
+                            </Ellipse>
+                            <TextBlock Text="vJoy Device 1" FontSize="12"/>
+                        </StackPanel>
+                    </StackPanel>
+                </Border>
+
+                <TextBlock Text="ACTIVE PROFILE" FontWeight="Bold" Margin="0,30,0,10" Foreground="#555"/>
+                <Border Background="#222" CornerRadius="5" Padding="10">
+                    <TextBlock Text="{Binding ProfileName}" Foreground="#00D2FF" FontWeight="Bold"/>
+                </Border>
+
+                <TextBlock Text="AXIS SENSITIVITY" FontWeight="Bold" Margin="0,30,0,10" Foreground="#555"/>
+                <Border Background="#111" CornerRadius="10" Padding="15">
+                    <StackPanel>
+                        <DockPanel Margin="0,0,0,15">
+                            <TextBlock Text="X AXIS" VerticalAlignment="Center" FontSize="11" Foreground="#888" Width="45"/>
+                            <TextBlock Text="{Binding SensitivityX, StringFormat=N1}" DockPanel.Dock="Right" VerticalAlignment="Center" FontSize="11" Foreground="#00D2FF" Margin="10,0,0,0"/>
+                            <Slider Minimum="0.1" Maximum="3.0" Value="{Binding SensitivityX}" VerticalAlignment="Center"/>
+                        </DockPanel>
+                        <DockPanel>
+                            <TextBlock Text="Y AXIS" VerticalAlignment="Center" FontSize="11" Foreground="#888" Width="45"/>
+                            <TextBlock Text="{Binding SensitivityY, StringFormat=N1}" DockPanel.Dock="Right" VerticalAlignment="Center" FontSize="11" Foreground="#00D2FF" Margin="10,0,0,0"/>
+                            <Slider Minimum="0.1" Maximum="3.0" Value="{Binding SensitivityY}" VerticalAlignment="Center"/>
+                        </DockPanel>
+                    </StackPanel>
+                </Border>
+
+                <TextBlock Text="CALIBRATION" FontWeight="Bold" Margin="0,20,0,10" Foreground="#555"/>
+                <UniformGrid Columns="2">
+                    <Button Content="SET CENTER" Margin="0,0,5,0" Padding="8" Background="#222" Foreground="#00D2FF" BorderBrush="#00D2FF" BorderThickness="1" Click="CalibrateCenter_Click" ToolTip="Fixes current stick position as neutral center"/>
+                    <Button Content="RESET ALL" Margin="5,0,0,0" Padding="8" Background="#222" Foreground="#FF5555" BorderBrush="#FF5555" BorderThickness="1" Click="ResetCalibration_Click" ToolTip="Resets learned axis limits and centers"/>
+                </UniformGrid>
+
+                <Border Background="#111" CornerRadius="10" Padding="15" Margin="0,20,0,0">
+                    <StackPanel>
+                        <TextBlock Text="SYSTEM SETTINGS" FontSize="14" Foreground="#555" Margin="0,0,0,10"/>
+                        <CheckBox IsChecked="{Binding RunAtStartup}" Content="Run at Startup" Foreground="White" Margin="0,0,0,10">
+                            <CheckBox.Style>
+                                <Style TargetType="CheckBox">
+                                    <Setter Property="Template">
+                                        <Setter.Value>
+                                            <ControlTemplate TargetType="CheckBox">
+                                                <StackPanel Orientation="Horizontal">
+                                                    <Border Width="16" Height="16" CornerRadius="3" BorderBrush="#00D2FF" BorderThickness="1" Background="#222">
+                                                        <Path Data="M 3,8 L 6,11 L 13,3" Stroke="#00D2FF" StrokeThickness="2" Visibility="Hidden" Name="CheckMark"/>
+                                                    </Border>
+                                                    <ContentPresenter Margin="10,0,0,0" VerticalAlignment="Center"/>
+                                                </StackPanel>
+                                                <ControlTemplate.Triggers>
+                                                    <Trigger Property="IsChecked" Value="True">
+                                                        <Setter TargetName="CheckMark" Property="Visibility" Value="Visible"/>
+                                                    </Trigger>
+                                                </ControlTemplate.Triggers>
+                                            </ControlTemplate>
+                                        </Setter.Value>
+                                    </Setter>
+                                </Style>
+                            </CheckBox.Style>
+                        </CheckBox>
+                        <CheckBox IsChecked="{Binding MinimizeToTray}" Content="Minimize to Tray" Foreground="White" Margin="0,0,0,10">
+                            <CheckBox.Style>
+                                <Style TargetType="CheckBox">
+                                    <Setter Property="Template">
+                                        <Setter.Value>
+                                            <ControlTemplate TargetType="CheckBox">
+                                                <StackPanel Orientation="Horizontal">
+                                                    <Border Width="16" Height="16" CornerRadius="3" BorderBrush="#00D2FF" BorderThickness="1" Background="#222">
+                                                        <Path Data="M 3,8 L 6,11 L 13,3" Stroke="#00D2FF" StrokeThickness="2" Visibility="Hidden" Name="CheckMark"/>
+                                                    </Border>
+                                                    <ContentPresenter Margin="10,0,0,0" VerticalAlignment="Center"/>
+                                                </StackPanel>
+                                                <ControlTemplate.Triggers>
+                                                    <Trigger Property="IsChecked" Value="True">
+                                                        <Setter TargetName="CheckMark" Property="Visibility" Value="Visible"/>
+                                                    </Trigger>
+                                                </ControlTemplate.Triggers>
+                                            </ControlTemplate>
+                                        </Setter.Value>
+                                    </Setter>
+                                </Style>
+                            </CheckBox.Style>
+                        </CheckBox>
+                        <CheckBox IsChecked="{Binding CloseToTray}" Content="Close to Tray" Foreground="White">
+                            <CheckBox.Style>
+                                <Style TargetType="CheckBox">
+                                    <Setter Property="Template">
+                                        <Setter.Value>
+                                            <ControlTemplate TargetType="CheckBox">
+                                                <StackPanel Orientation="Horizontal">
+                                                    <Border Width="16" Height="16" CornerRadius="3" BorderBrush="#00D2FF" BorderThickness="1" Background="#222">
+                                                        <Path Data="M 3,8 L 6,11 L 13,3" Stroke="#00D2FF" StrokeThickness="2" Visibility="Hidden" Name="CheckMark"/>
+                                                    </Border>
+                                                    <ContentPresenter Margin="10,0,0,0" VerticalAlignment="Center"/>
+                                                </StackPanel>
+                                                <ControlTemplate.Triggers>
+                                                    <Trigger Property="IsChecked" Value="True">
+                                                        <Setter TargetName="CheckMark" Property="Visibility" Value="Visible"/>
+                                                    </Trigger>
+                                                </ControlTemplate.Triggers>
+                                            </ControlTemplate>
+                                        </Setter.Value>
+                                    </Setter>
+                                </Style>
+                            </CheckBox.Style>
+                        </CheckBox>
+                    </StackPanel>
+                </Border>
+
+                <Border Background="#111" CornerRadius="10" Padding="15" Margin="0,20,0,0">
+                    <StackPanel>
+                        <TextBlock Text="HID DEBUG (Raw Bytes)" FontSize="10" Foreground="#444" Margin="0,0,0,5"/>
+                        <TextBlock Text="{Binding RawDataString}" FontSize="11" FontFamily="Consolas" Foreground="#00D2FF" TextWrapping="Wrap"/>
+                    </StackPanel>
+                </Border>
+
+                <Button Content="EDIT MAPPINGS" Margin="0,20,0,0" Padding="10" Background="#00D2FF" Foreground="Black" BorderThickness="0" Click="EditMappings_Click">
+                    <Button.Resources>
+                        <Style TargetType="Border">
+                            <Setter Property="CornerRadius" Value="5"/>
+                        </Style>
+                    </Button.Resources>
+                </Button>
+            </StackPanel>
+        </Grid>
+    </ScrollViewer>
+</Window>
