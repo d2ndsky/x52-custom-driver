@@ -26,6 +26,21 @@ namespace X52.CustomDriver.Core.Services
 
         public bool IsAvailable { get; private set; }
         public uint DeviceId { get; private set; }
+        public string DeviceName 
+        {
+            get
+            {
+                try
+                {
+                    // vJoy VID/PID is 1234/BEAD. Windows stores the name in the registry.
+                    using var key = Microsoft.Win32.Registry.CurrentUser.OpenSubKey(@"System\CurrentControlSet\Control\MediaProperties\PrivateProperties\Joystick\OEM\VID_1234&PID_BEAD");
+                    var name = key?.GetValue("OEMName") as string;
+                    if (!string.IsNullOrEmpty(name)) return name;
+                }
+                catch { }
+                return $"vJoy Device {DeviceId}";
+            }
+        }
 
         public bool Initialize(uint deviceId)
         {

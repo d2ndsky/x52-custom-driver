@@ -113,6 +113,7 @@ namespace X52.CustomDriver.App.ViewModels
 
         public bool IsConnected => _hidService.IsConnected;
         public bool IsVJoyActive => _vJoyService.IsAvailable;
+        public string VJoyDeviceName => _vJoyService.DeviceName;
 
         public X52ViewModel(IHidService hidService, IVJoyService vJoyService, ProfileService profileService, SettingsService settingsService)
         {

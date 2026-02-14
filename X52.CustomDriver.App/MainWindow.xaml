@@ -247,7 +247,7 @@
                                     </Style>
                                 </Ellipse.Style>
                             </Ellipse>
-                            <TextBlock Text="vJoy Device 1" FontSize="12"/>
+                            <TextBlock Text="{Binding VJoyDeviceName}" FontSize="12"/>
                         </StackPanel>
                     </StackPanel>
                 </Border>

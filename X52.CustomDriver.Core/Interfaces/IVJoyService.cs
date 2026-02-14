@@ -6,6 +6,7 @@ namespace X52.CustomDriver.Core.Interfaces
     {
         bool IsAvailable { get; }
         uint DeviceId { get; }
+        string DeviceName { get; }
         
         bool Initialize(uint deviceId);
         void Shutdown();
