@@ -220,44 +220,51 @@ namespace X52.CustomDriver.App.ViewModels
         {
             if (!_vJoyService.IsAvailable) return;
             
-            // Apply Sensitivity
-            double sensX = CurrentProfile.AxisSettings.SensitivityX;
-            double sensY = CurrentProfile.AxisSettings.SensitivityY;
-            
-            int cx = 1024;
-            double rawX = (s.X - cx) * sensX + cx;
-            double rawY = (s.Y - cx) * sensY + cx;
-            
-            int finalX = Math.Clamp((int)rawX, 0, 2048);
-            int finalY = Math.Clamp((int)rawY, 0, 2048);
+            // --- AXES MAPPING (Synced with Console v1.1.7) ---
+            int vX = s.X * 16;
+            int vY = s.Y * 16;
+            int vZ = s.Z * 32;
 
-            _vJoyService.SetAxisX(finalX * 16);
-            _vJoyService.SetAxisY(finalY * 16);
-            _vJoyService.SetAxisZ(s.Z * 32);
+            // Throttle Calibration: Physical [245 -> 10] maps to [255 -> 0]
+            // Scale to vJoy (0-32768)
+            int vT = (255 - s.Throttle) * 128; 
             
-            _vJoyService.SetRx(s.Throttle * 128);
-            _vJoyService.SetRy(s.Rotary1 * 128);
-            _vJoyService.SetRz(s.Rotary2 * 128);
-            _vJoyService.SetSlider(s.Slider * 128);
+            int vR1 = s.Rotary1 * 128;
+            int vR2 = s.Rotary2 * 128;
+            int vS = s.Slider * 128;
+
+            _vJoyService.SetAxisX(vX);
+            _vJoyService.SetAxisY(vY);
+            _vJoyService.SetAxisZ(vZ);
+            _vJoyService.SetRx(vT);
+            _vJoyService.SetRy(vR1);
+            _vJoyService.SetRz(vR2);
+            _vJoyService.SetSlider(vS);
             
-            // --- GHOSTBUSTER LOGIC (Ported from Console) ---
+            // --- GHOSTBUSTER LOGIC (Synced & Fixed Botón 24) ---
             if (s.RawData != null)
             {
                  int vBtn = 1 + (s.CurrentMode - 1) * 32;
                  
-                 // Limit to B11 to avoid mapping Raw Hat 2 (B12) and Nub Noise (B13) to buttons 33-48
                  for (int b = 8; b < Math.Min(s.RawData.Length, 12); b++)
                  {
                      for (int bit = 0; bit < 8; bit++)
                      {
+                         // GHOSTBUSTER: Ignore internal Mode bits
+                         // B10 Bit 7 = Mode 1 (Standard)
+                         // B11 Bits 0 & 1 = Mode 2 & 3 (Standard)
+                         if ((b == 10 && bit == 7) || (b == 11 && (bit == 0 || bit == 1)))
+                         {
+                             vBtn++;
+                             continue;
+                         }
+
                          if (vBtn <= 128)
                              _vJoyService.SetButton(vBtn++, (s.RawData[b] & (1 << bit)) != 0);
                      }
                  }
 
                  // SILVER BULLET PHASE 2: Explicit Clean Mapping for Hat 2
-                 // We override buttons 29-32 (which might have been 0'd by B11 upper nibble)
-                 // baseBtn is 1. +28 -> 29.
                  int baseId = 1 + (s.CurrentMode - 1) * 32;
                  _vJoyService.SetButton(baseId + 28, s.Hat2Up);    // Button 29
                  _vJoyService.SetButton(baseId + 29, s.Hat2Down);  // Button 30

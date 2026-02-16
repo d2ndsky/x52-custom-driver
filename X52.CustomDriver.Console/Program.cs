@@ -178,6 +178,15 @@ namespace X52.CustomDriver.ConsoleHost
             {
                 for (int bit = 0; bit < 8; bit++)
                 {
+                    // GHOSTBUSTER: Ignore internal Mode bits from being mapped as virtual buttons
+                    // B10 Bit 7 = Mode 1 (Standard)
+                    // B11 Bits 0 & 1 = Mode 2 & 3 (Standard)
+                    if ((b == 10 && bit == 7) || (b == 11 && (bit == 0 || bit == 1)))
+                    {
+                        vBtn++;
+                        continue;
+                    }
+
                     if (vBtn <= 128)
                         _vJoyService.SetButton(vBtn++, (state.RawData[b] & (1 << bit)) != 0);
                 }
